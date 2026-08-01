@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ELAKİN Hece ve Araba Oyunu</title>
+    <style>
+        :root {
+            --bg-color: #f0f7ff;
+            --card-bg: #ffffff;
+            --font-family: 'Fredoka', 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            
+            /* Harf Renkleri */
+            --color-e: #ff4757;
+            --color-l: #ffa502;
+            --color-a: #2ed573;
+            --color-k: #9b59b6;
+            --color-i: #00d2d3;
+            --color-n: #ff6b81;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: #2f3542;
+            margin: 0;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            touch-action: manipulation;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #1e90ff;
+            font-size: 1.8rem;
+            margin: 0 0 4px 0;
+            text-shadow: 2px 2px 0px #ffffff, 4px 4px 0px rgba(0,0,0,0.05);
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #747d8c;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        /* MOD SEÇİM SEKMELERİ */
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: #dfe4ea;
+            color: #57606f;
+            border: none;
+            padding: 12px 10px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            font-family: inherit;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 0 #a4b0be;
+        }
+
+        .tab-btn.active {
+            background: #ff4757;
+            color: white;
+            box-shadow: 0 4px 0 #d63031;
+            transform: translateY(-2px);
+        }
+
+        .main-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 18px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* HECE SEÇİM ŞERİDİ */
+        .syllable-picker {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .picker-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #57606f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .syllable-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 110px;
+            overflow-y: auto;
+            padding: 8px;
+            background: #f1f2f6;
+            border-radius: 16px;
+            border: 2px solid #e4e7eb;
+        }
+
+        .syllable-chip {
+            background: white;
+            border: 2px solid #ced6e0;
+            padding: 6px 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #ced6e0;
+            transition: all 0.15s ease;
+        }
+
+        .syllable-chip:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .syllable-chip.active {
+            background: #2ed573;
+            color: white;
+            border-color: #26af5f;
+            box-shadow: 0 3px 0 #26af5f;
+        }
+
+        /* ARABA VE YOL ALANI */
+        .road-wrapper {
+            position: relative;
+            width: 100%;
+            height: 130px;
+            background: #353b48;
+            border-radius: 20px;
+            border: 4px solid #2f3640;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            overflow: hidden;
+            touch-action: none; /* iPad'de kaydırmayı engeller */
+        }
+
+        .road-dashed-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-top: 4px dashed #fbc531;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .letter-station {
+            width: 60px;
+            height: 60px;
+            background: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            border: 4px solid;
+            transition: transform 0.2s;
+        }
+
+        .letter-station.pulse {
+            transform: scale(1.15);
+        }
+
+        .car-element {
+            position: absolute;
+            left: 75px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3.2rem;
+            cursor: grab;
+            z-index: 4;
+            transition: transform 0.1s ease;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        .car-element:active {
+            cursor: grabbing;
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        /* SONUÇ VE OKUMA ALANI */
+        .result-card {
+            background: #fff9db;
+            border: 3px dashed #f1c40f;
+            border-radius: 20px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            min-height: 90px;
+            transition: transform 0.15s;
+        }
+
+        .result-card:active {
+            transform: scale(0.98);
+        }
+
+        .result-display {
+            font-size: 3.2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        .result-hint {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* SERBEST BİRLEŞTİRME MODU */
+        .free-slots {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            background: #eef5fc;
+            padding: 15px;
+            border-radius: 20px;
+            border: 3px dashed #70a1ff;
+        }
+
+        .slot-box {
+            width: 65px;
+            height: 75px;
+            background: white;
+            border: 3px solid #ced6e0;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            font-weight: bold;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .combine-action-btn {
+            background: #2ed573;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 10px 18px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #26af5f;
+        }
+
+        .combine-action-btn:disabled {
+            background: #cbd5e1;
+            box-shadow: 0 4px 0 #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .letters-column-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .column-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 6px;
+            color: #475569;
+        }
+
+        .letter-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .btn-letter {
+            background: white;
+            border: 3px solid;
+            border-radius: 14px;
+            padding: 10px 0;
+            font-size: 1.7rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.08);
+            transition: all 0.1s ease;
+        }
+
+        .btn-letter.selected {
+            background: #2f3542;
+            color: white !important;
+            border-color: #000 !important;
+            transform: scale(1.05);
+        }
+
+        /* HARF RENK SINIFLARI */
+        .color-e { color: var(--color-e); border-color: var(--color-e); }
+        .color-l { color: var(--color-l); border-color: var(--color-l); }
+        .color-a { color: var(--color-a); border-color: var(--color-a); }
+        .color-k { color: var(--color-k); border-color: var(--color-k); }
+        .color-i { color: var(--color-i); border-color: var(--color-i); }
+        .color-n { color: var(--color-n); border-color: var(--color-n); }
+
+        .reset-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #d63031;
+        }
+
+        /* KUTLAMA YILDIZLARI ANIMASYONU */
+        .confetti-star {
+            position: absolute;
+            font-size: 2rem;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            z-index: 10;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+            100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.5); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎈 ELAKİN Hece Oyunu 🎈</h1>
+        <p class="subtitle">Harfleri sür, birleştir ve sesleri öğren!</p>
+    </header>
+
+    <!-- TAB DÜĞMELERİ -->
+    <div class="tab-menu">
+        <button class="tab-btn active" id="btnCarTab" onclick="switchTab('carTab')">🏎️ Araba Sürüşü</button>
+        <button class="tab-btn" id="btnFreeTab" onclick="switchTab('freeTab')">🔤 Serbest Birleştirme</button>
+    </div>
+
+    <div class="main-card">
+        
+        <!-- KATMAN 1: ARABA SÜRÜŞÜ MODU -->
+        <div id="carTab" class="tab-content active">
+            <div class="syllable-picker">
+                <div class="picker-title">
+                    <span>Çalışılacak Heceyi Seç:</span>
+                    <span id="syllableCount" style="color:#1e90ff;">(1 / 36)</span>
+                </div>
+                <div class="syllable-grid" id="syllableChipsContainer"></div>
+            </div>
+
+            <!-- Araba Pisti -->
+            <div class="road-wrapper" id="roadContainer">
+                <div class="road-dashed-line"></div>
+                <div class="letter-station color-e" id="startStation">E</div>
+                <div class="car-element" id="carIcon">🏎️</div>
+                <div class="letter-station color-l" id="endStation">L</div>
+            </div>
+
+            <!-- Okuma Paneli -->
+            <div class="result-card" onclick="speakCurrentSyllable()">
+                <div class="result-display" id="carResultDisplay">EL</div>
+                <span class="result-hint">Arabayı sağdaki harfe sür veya heceye dokun 🔊</span>
+            </div>
+        </div>
+
+        <!-- KATMAN 2: SERBEST SEÇİM VE BİRLEŞTİRME -->
+        <div id="freeTab" class="tab-content">
+            <div class="free-slots">
+                <div class="slot-box" id="slot1">?</div>
+                <span style="font-size: 2rem; font-weight: bold; color: #a4b0be;">+</span>
+                <div class="slot-box" id="slot2">?</div>
+                <button class="combine-action-btn" id="btnCombine" onclick="combineFreeLetters()" disabled>OKU!</button>
+            </div>
+
+            <div class="result-card" onclick="speakFreeSyllable()">
+                <div class="result-display" id="freeResultDisplay">✨</div>
+                <span class="result-hint">Dinlemek için tıklayın 🔊</span>
+            </div>
+
+            <div class="letters-column-container">
+                <div>
+                    <div class="column-title">1. Harf</div>
+                    <div class="letter-buttons-grid" id="gridFirstLetters"></div>
+                </div>
+                <div>
+                    <div class="column-title">2. Harf</div>
+                    <div class="letter-buttons-grid" id="gridSecondLetters"></div>
+                </div>
+            </div>
+
+            <button class="reset-btn" onclick="resetFreeMode()">Temizle 🗑️</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ELAKİN Tanımları
+        const letterData = [
+            { char: 'e', colorClass: 'color-e' },
+            { char: 'l', colorClass: 'color-l' },
+            { char: 'a', colorClass: 'color-a' },
+            { char: 'k', colorClass: 'color-k' },
+            { char: 'i', colorClass: 'color-i' },
+            { char: 'n', colorClass: 'color-n' }
+        ];
+
+        // 36 Olası İkili Hece Listesi
+        const allSyllables = [];
+        letterData.forEach(l1 => {
+            letterData.forEach(l2 => {
+                allSyllables.push(l1.char + l2.char);
+            });
+        });
+
+        let activeCarSyllable = "el";
+        let isAudioInitialized = false;
+
+        // Web Audio API Motor Sesi Sentezleyici
+        let audioCtx = null;
+        let motorOsc = null;
+        let motorGain = null;
+
+        function initAudio() {
+            if (isAudioInitialized) return;
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                isAudioInitialized = true;
+            } catch(e) {}
+        }
+
+        function startMotorSound() {
+            initAudio();
+            if (!audioCtx) return;
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            try {
+                motorOsc = audioCtx.createOscillator();
+                motorGain = audioCtx.createGain();
+
+                motorOsc.type = 'sawtooth';
+                motorOsc.frequency.setValueAtTime(55, audioCtx.currentTime); // Düşük rölanti sesi
+
+                motorGain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+
+                motorOsc.connect(motorGain);
+                motorGain.connect(audioCtx.destination);
+                motorOsc.start();
+            } catch(e) {}
+        }
+
+        function updateMotorPitch(progress) {
+            if (motorOsc && audioCtx) {
+                // Sürükleme ilerledikçe motor devri yükselir (55Hz -> 180Hz)
+                const freq = 55 + (progress * 125);
+                motorOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.05);
+            }
+        }
+
+        function stopMotorSound() {
+            if (motorOsc) {
+                try {
+                    motorOsc.stop();
+                    motorOsc.disconnect();
+                } catch(e) {}
+                motorOsc = null;
+            }
+        }
+
+        // --- UYGULAMA BAŞLANGICI ---
+        window.onload = () => {
+            setupSyllableChips();
+            setupCarDrivingLogic();
+            setupFreeMode();
+            selectCarSyllable('el');
+        };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            if (tabId === 'carTab') {
+                document.getElementById('btnCarTab').classList.add('active');
+                document.getElementById('carTab').classList.add('active');
+            } else {
+                document.getElementById('btnFreeTab').classList.add('active');
+                document.getElementById('freeTab').classList.add('active');
+            }
+        }
+
+        // --- ARABA MODU MANTIĞI ---
+        function setupSyllableChips() {
+            const container = document.getElementById('syllableChipsContainer');
+            container.innerHTML = '';
+
+            allSyllables.forEach((syl, idx) => {
+                const chip = document.createElement('div');
+                chip.className = `syllable-chip ${syl === activeCarSyllable ? 'active' : ''}`;
+                chip.innerText = syl.toUpperCase();
+                chip.onclick = () => selectCarSyllable(syl);
+                container.appendChild(chip);
+            });
+        }
+
+        function selectCarSyllable(syl) {
+            activeCarSyllable = syl;
+            const char1 = syl[0];
+            const char2 = syl[1];
+
+            const item1 = letterData.find(l => l.char === char1);
+            const item2 = letterData.find(l => l.char === char2);
+
+            const startSt = document.getElementById('startStation');
+            const endSt = document.getElementById('endStation');
+
+            startSt.innerText = char1.toUpperCase();
+            startSt.className = `letter-station ${item1.colorClass}`;
+
+            endSt.innerText = char2.toUpperCase();
+            endSt.className = `letter-station ${item2.colorClass}`;
+
+            document.getElementById('carResultDisplay').innerHTML = `
+                <span class="${item1.colorClass}">${char1.toUpperCase()}</span><span class="${item2.colorClass}">${char2.toUpperCase()}</span>
+            `;
+
+            // Sayaç güncelle
+            const index = allSyllables.indexOf(syl) + 1;
+            document.getElementById('syllableCount').innerText = `(${index} / ${allSyllables.length})`;
+
+            // Çip aktifliği
+            const chips = document.querySelectorAll('.syllable-chip');
+            chips.forEach(c => {
+                c.classList.toggle('active', c.innerText === syl.toUpperCase());
+            });
+
+            resetCarPosition();
+        }
+
+        function resetCarPosition() {
+            const car = document.getElementById('carIcon');
+            car.style.left = '75px';
+        }
+
+        function setupCarDrivingLogic() {
+            const car = document.getElementById('carIcon');
+            const road = document.getElementById('roadContainer');
+            let isDragging = false;
+
+            const onStart = (e) => {
+                e.preventDefault();
+                isDragging = true;
+                startMotorSound();
+            };
+
+            const onMove = (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const roadRect = road.getBoundingClientRect();
+
+                let newX = clientX - roadRect.left - 25;
+
+                const minX = 75;
+                const maxX = roadRect.width - 115;
+
+                if (newX < minX) newX = minX;
+                if (newX > maxX) newX = maxX;
+
+                car.style.left = `${newX}px`;
+
+                // İlerleme yüzdesi
+                const progress = (newX - minX) / (maxX - minX);
+                updateMotorPitch(progress);
+
+                // Varış noktası
+                if (newX >= maxX - 2) {
+                    isDragging = false;
+                    stopMotorSound();
+                    triggerArrivalEffect();
+                    speakCurrentSyllable();
+                    resetCarPosition();
+                }
+            };
+
+            const onEnd = (e) => {
+                if (isDragging) {
+                    isDragging = false;
+                    stopMotorSound();
+                    resetCarPosition();
+                }
+            };
+
+            // Fare Olayları
+            car.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            // Dokunmatik Olayları (iPad / Telefon)
+            car.addEventListener('touchstart', onStart, { passive: false });
+            window.addEventListener('touchmove', onMove, { passive: false });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        function triggerArrivalEffect() {
+            const endSt = document.getElementById('endStation');
+            endSt.classList.add('pulse');
+            setTimeout(() => endSt.classList.remove('pulse'), 300);
+
+            // Yıldız efekti
+            const container = document.getElementById('carTab');
+            for (let i = 0; i < 6; i++) {
+                const star = document.createElement('div');
+                star.className = 'confetti-star';
+                star.innerText = '⭐';
+                star.style.left = '80%';
+                star.style.top = '50%';
+                star.style.setProperty('--dx', `${(Math.random() - 0.5) * 160}px`);
+                star.style.setProperty('--dy', `${-60 - Math.random() * 80}px`);
+                container.appendChild(star);
+
+                setTimeout(() => star.remove(), 800);
+            }
+        }
+
+        function speakCurrentSyllable() {
+            speakText(activeCarSyllable);
+        }
+
+        // --- SERBEST MOD MANTIĞI ---
+        let selectedLetter1 = null;
+        let selectedLetter2 = null;
+
+        function setupFreeMode() {
+            renderLetterGrid('gridFirstLetters', 1);
+            renderLetterGrid('gridSecondLetters', 2);
+        }
+
+        function renderLetterGrid(containerId, slotNum) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            letterData.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `btn-letter ${item.colorClass}`;
+                btn.innerText = item.char;
+                btn.onclick = () => handleFreeLetterSelect(item, slotNum, btn, containerId);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleFreeLetterSelect(item, slotNum, buttonEl, containerId) {
+            speakText(item.char);
+
+            const buttons = document.querySelectorAll(`#${containerId} .btn-letter`);
+            buttons.forEach(b => b.classList.remove('selected'));
+            buttonEl.classList.add('selected');
+
+            if (slotNum === 1) {
+                selectedLetter1 = item;
+                const s1 = document.getElementById('slot1');
+                s1.innerText = item.char.toUpperCase();
+                s1.className = `slot-box ${item.colorClass}`;
+            } else {
+                selectedLetter2 = item;
+                const s2 = document.getElementById('slot2');
+                s2.innerText = item.char.toUpperCase();
+                s2.className = `slot-box ${item.colorClass}`;
+            }
+
+            document.getElementById('btnCombine').disabled = !(selectedLetter1 && selectedLetter2);
+        }
+
+        function combineFreeLetters() {
+            if (!selectedLetter1 || !selectedLetter2) return;
+            const syl = selectedLetter1.char + selectedLetter2.char;
+
+            document.getElementById('freeResultDisplay').innerHTML = `
+                <span class="${selectedLetter1.colorClass}">${selectedLetter1.char.toUpperCase()}</span><span class="${selectedLetter2.colorClass}">${selectedLetter2.char.toUpperCase()}</span>
+            `;
+
+            speakText(syl);
+        }
+
+        function speakFreeSyllable() {
+            if (selectedLetter1 && selectedLetter2) {
+                speakText(selectedLetter1.char + selectedLetter2.char);
+            }
+        }
+
+        function resetFreeMode() {
+            selectedLetter1 = null;
+            selectedLetter2 = null;
+
+            const s1 = document.getElementById('slot1');
+            const s2 = document.getElementById('slot2');
+
+            s1.innerText = '?';
+            s1.className = 'slot-box';
+            s2.innerText = '?';
+            s2.className = 'slot-box';
+
+            document.getElementById('freeResultDisplay').innerText = '✨';
+            document.getElementById('btnCombine').disabled = true;
+
+            document.querySelectorAll('.btn-letter').forEach(b => b.classList.remove('selected'));
+        }
+
+        // TÜRÇE SESLENDİRME ENGINE
+        function speakText(text) {
+            initAudio();
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Önceki okumayı kes
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'tr-TR';
+                utterance.rate = 0.75; // 1. sınıf pedagojisine uygun net, yavaş tempo
+                utterance.pitch = 1.15; // Eğlenceli tonlama
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+</html>
+```eofs
+
+### 📋 Güncelleme Özeti ve Önizleme
+
+1. **Araba Modu (Katman 1):**
+   * Üst kısımda ELAKİN ses grubundan türetilmiş **tüm 36 hece** kartlar halinde bulunur.
+   * Arabayı parmağınızla soldan sağa sürüklediğinizde motor sesi kademeli olarak yükselir.
+   * Hedef harfe varıldığında **yıldızlar patlar** ve hece net bir Türkçe ses tonuyla seslendirilir.
+2. **Serbest Mod (Katman 2):**
+   * Çocuğun 1. ve 2. harfi serbestçe seçip "OKU!" butonuna basarak hece türetmesini sağlar.
+3. **iPad & Dokunmatik Ekran Uyumluğu:**
+   * iPad cihazlarda sürükleme esnasında sayfanın yukarı/aşağı kayması engellendi.
+   * Buton boyutları 6-7 yaşındaki bir çocuğun rahatlıkla basabileceği büyüklüğe getirildi.
+
+Bu dosyayı doğrudan GitHub deposundaki `index.html` dosyanızın yerine yapıştırıp güncelleyebilirsiniz!
