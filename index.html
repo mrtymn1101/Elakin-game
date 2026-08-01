@@ -9,6 +9,10 @@
             --bg-color: #f0f7ff;
             --card-bg: #ffffff;
             --font-family: 'Fredoka', 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            
+            /* Renk Ayrımı */
+            --first-group-color: #3b82f6; /* 1. Harf: Canlı Mavi */
+            --second-group-color: #10b981; /* 2. Harf: Canlı Yeşil */
         }
 
         * {
@@ -96,9 +100,9 @@
         }
 
         .tab-btn.active {
-            background: #2ed573;
+            background: #8e44ad;
             color: white;
-            box-shadow: 0 4px 0 #26af5f;
+            box-shadow: 0 4px 0 #6c5ce7;
         }
 
         .main-card {
@@ -203,8 +207,17 @@
             font-weight: bold;
             z-index: 2;
             box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-            border: 4px solid #ff4757;
-            color: #ff4757;
+            border: 4px solid;
+        }
+
+        #startStation {
+            border-color: var(--first-group-color);
+            color: var(--first-group-color);
+        }
+
+        #endStation {
+            border-color: var(--second-group-color);
+            color: var(--second-group-color);
         }
 
         .car-element {
@@ -251,7 +264,7 @@
             margin-top: 4px;
         }
 
-        /* SERBEST BİRLEŞTİRME MODU */
+        /* SERBEST BİRLEŞTİRME MODU VE RENK AYRIMI */
         .free-slots {
             display: flex;
             justify-content: center;
@@ -267,7 +280,7 @@
             width: 65px;
             height: 75px;
             background: white;
-            border: 3px solid #ced6e0;
+            border: 4px solid #ced6e0;
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -275,6 +288,16 @@
             font-size: 2.4rem;
             font-weight: bold;
             color: #2f3542;
+        }
+
+        .slot-box.slot-first {
+            border-color: var(--first-group-color);
+            color: var(--first-group-color);
+        }
+
+        .slot-box.slot-second {
+            border-color: var(--second-group-color);
+            color: var(--second-group-color);
         }
 
         .combine-action-btn {
@@ -302,12 +325,36 @@
             gap: 12px;
         }
 
-        .column-title {
-            font-size: 0.95rem;
+        /* 1. Kısım Mavi Kutu */
+        .column-box-first {
+            background: #eff6ff;
+            padding: 10px;
+            border-radius: 16px;
+            border: 2px solid #bfdbfe;
+        }
+
+        /* 2. Kısım Yeşil Kutu */
+        .column-box-second {
+            background: #ecfdf5;
+            padding: 10px;
+            border-radius: 16px;
+            border: 2px solid #a7f3d0;
+        }
+
+        .column-title-first {
+            font-size: 1rem;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 6px;
-            color: #475569;
+            margin-bottom: 8px;
+            color: var(--first-group-color);
+        }
+
+        .column-title-second {
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+            color: var(--second-group-color);
         }
 
         .letter-buttons-grid {
@@ -316,23 +363,42 @@
             gap: 6px;
         }
 
-        .btn-letter {
+        /* 1. Grup Harf Butonları (Mavi) */
+        .btn-letter-first {
             background: white;
-            border: 3px solid #70a1ff;
-            color: #1e90ff;
+            border: 3px solid var(--first-group-color);
+            color: var(--first-group-color);
             border-radius: 14px;
             padding: 10px 0;
             font-size: 1.7rem;
             font-weight: bold;
             font-family: inherit;
             cursor: pointer;
-            box-shadow: 0 3px 0 rgba(0,0,0,0.08);
+            box-shadow: 0 3px 0 #bfdbfe;
         }
 
-        .btn-letter.selected {
-            background: #1e90ff;
+        .btn-letter-first.selected {
+            background: var(--first-group-color);
             color: white !important;
-            border-color: #0984e3 !important;
+        }
+
+        /* 2. Grup Harf Butonları (Yeşil) */
+        .btn-letter-second {
+            background: white;
+            border: 3px solid var(--second-group-color);
+            color: var(--second-group-color);
+            border-radius: 14px;
+            padding: 10px 0;
+            font-size: 1.7rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #a7f3d0;
+        }
+
+        .btn-letter-second.selected {
+            background: var(--second-group-color);
+            color: white !important;
         }
 
         .reset-btn {
@@ -368,7 +434,7 @@
         <h1>🎈 İlkokul Hece Oyunu 🎈</h1>
     </header>
 
-    <!-- SEVİYE (LEVEL) SEÇİMİ -->
+    <!-- SEVİYE SEÇİMİ -->
     <div class="level-container">
         <button class="level-btn active" id="btnLvl1" onclick="selectLevel(1)">1. Seviye: E-L-A-K-İ-N</button>
         <button class="level-btn" id="btnLvl2" onclick="selectLevel(2)">2. Seviye: O-M-U-T-Ü-Y</button>
@@ -392,13 +458,11 @@
                 <div class="syllable-grid" id="syllableChipsContainer"></div>
             </div>
 
-            <!-- Araba Pisti (Soldan Sağa) -->
+            <!-- Araba Pisti -->
             <div class="road-wrapper" id="roadContainer">
                 <div class="road-dashed-line"></div>
-                <!-- 1. Harf Sol Tarafta -->
                 <div class="letter-station" id="startStation">E</div>
                 <div class="car-element" id="carIcon">🏎️</div>
-                <!-- 2. Harf Sağ Tarafta -->
                 <div class="letter-station" id="endStation">L</div>
             </div>
 
@@ -408,12 +472,12 @@
             </div>
         </div>
 
-        <!-- KATMAN 2: SERBEST SEÇİM MODU -->
+        <!-- KATMAN 2: SERBEST SEÇİM MODU (RENK AYRIMLI) -->
         <div id="freeTab" class="tab-content">
             <div class="free-slots">
-                <div class="slot-box" id="slot1">?</div>
+                <div class="slot-box slot-first" id="slot1">?</div>
                 <span style="font-size: 2rem; font-weight: bold; color: #a4b0be;">+</span>
-                <div class="slot-box" id="slot2">?</div>
+                <div class="slot-box slot-second" id="slot2">?</div>
                 <button class="combine-action-btn" id="btnCombine" onclick="combineFreeLetters()" disabled>OKU!</button>
             </div>
 
@@ -423,12 +487,14 @@
             </div>
 
             <div class="letters-column-container">
-                <div>
-                    <div class="column-title">1. Harf</div>
+                <!-- 1. Kısım: Mavi Tema -->
+                <div class="column-box-first">
+                    <div class="column-title-first">🟦 1. Harf</div>
                     <div class="letter-buttons-grid" id="gridFirstLetters"></div>
                 </div>
-                <div>
-                    <div class="column-title">2. Harf</div>
+                <!-- 2. Kısım: Yeşil Tema -->
+                <div class="column-box-second">
+                    <div class="column-title-second">🟩 2. Harf</div>
                     <div class="letter-buttons-grid" id="gridSecondLetters"></div>
                 </div>
             </div>
@@ -439,36 +505,41 @@
     </div>
 
     <script>
-        // MEB 1. SINIF PEDAGOJİK HECE VERİTABANI
+        // MEB 1. SINIF HECE VERİTABANI
         const levelData = {
             1: {
                 name: "E-L-A-K-İ-N",
                 letters: ['e', 'l', 'a', 'k', 'i', 'n'],
-                // Müfredata uygun anlamlı 2'li heceler
                 syllables: ["el", "le", "ak", "ka", "ek", "ke", "al", "la", "il", "li", "ik", "ki", "in", "ni", "an", "na"]
             },
             2: {
                 name: "O-M-U-T-Ü-Y",
                 letters: ['o', 'm', 'u', 't', 'ü', 'y'],
-                // Müfredata uygun 2. grup anlamlı heceler
                 syllables: ["om", "mo", "ot", "to", "um", "mu", "ut", "tu", "üm", "mü", "üt", "tü", "oy", "yo", "uy", "yu"]
             }
         };
 
+        // KESİN TÜRKÇE TELAFUZ SÖZLÜĞÜ (Okuma Ses Hatalarını Önler)
+        const trPhonetics = {
+            'e': 'e', 'l': 'le', 'a': 'a', 'k': 'ke', 'i': 'i', 'n': 'ne',
+            'o': 'o', 'm': 'me', 'u': 'u', 't': 'te', 'ü': 'ü', 'y': 'ye',
+            'el': 'el', 'le': 'le', 'ak': 'ak', 'ka': 'ka', 'ek': 'ek', 'ke': 'ke',
+            'al': 'al', 'la': 'la', 'il': 'il', 'li': 'li', 'ik': 'ik', 'ki': 'ki',
+            'in': 'in', 'ni': 'ni', 'an': 'an', 'na': 'na', 'om': 'om', 'mo': 'mo',
+            'ot': 'ot', 'to': 'to', 'um': 'um', 'mu': 'mu', 'ut': 'ut', 'tu': 'tu',
+            'üm': 'üm', 'mü': 'mü', 'üt': 'üt', 'tü': 'tü', 'oy': 'oy', 'yo': 'yo',
+            'uy': 'uy', 'yu': 'yu'
+        };
+
         let currentLevel = 1;
         let activeCarSyllable = "el";
-        
-        // Ses Sentezleyici & Motor Sesi
-        let audioCtx = null;
-        let motorOsc = null;
-        let motorGain = null;
+        let isDrivingSoundActive = false;
         let turkishVoice = null;
 
-        // Türkçe Sesini Bulma
         function loadVoices() {
             if ('speechSynthesis' in window) {
                 const voices = window.speechSynthesis.getVoices();
-                turkishVoice = voices.find(v => v.lang.includes('tr') || v.lang.includes('TR'));
+                turkishVoice = voices.find(v => v.lang.startsWith('tr'));
             }
         }
         if ('speechSynthesis' in window) {
@@ -476,53 +547,6 @@
             loadVoices();
         }
 
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-
-        function startMotorSound() {
-            initAudio();
-            if (!audioCtx) return;
-
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            try {
-                motorOsc = audioCtx.createOscillator();
-                motorGain = audioCtx.createGain();
-
-                motorOsc.type = 'sawtooth';
-                motorOsc.frequency.setValueAtTime(55, audioCtx.currentTime);
-
-                motorGain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-
-                motorOsc.connect(motorGain);
-                motorGain.connect(audioCtx.destination);
-                motorOsc.start();
-            } catch(e) {}
-        }
-
-        function updateMotorPitch(progress) {
-            if (motorOsc && audioCtx) {
-                const freq = 55 + (progress * 130);
-                motorOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.05);
-            }
-        }
-
-        function stopMotorSound() {
-            if (motorOsc) {
-                try {
-                    motorOsc.stop();
-                    motorOsc.disconnect();
-                } catch(e) {}
-                motorOsc = null;
-            }
-        }
-
-        // --- SAYFA BAŞLATMA ---
         window.onload = () => {
             selectLevel(1);
             setupCarDrivingLogic();
@@ -559,7 +583,6 @@
         function setupSyllableChips() {
             const container = document.getElementById('syllableChipsContainer');
             container.innerHTML = '';
-
             const list = levelData[currentLevel].syllables;
 
             list.forEach(syl => {
@@ -578,7 +601,6 @@
 
             document.getElementById('startStation').innerText = char1.toUpperCase();
             document.getElementById('endStation').innerText = char2.toUpperCase();
-
             document.getElementById('carResultDisplay').innerText = syl.toUpperCase();
 
             const list = levelData[currentLevel].syllables;
@@ -598,6 +620,7 @@
             car.style.left = '75px';
         }
 
+        // Arabayı Çekerken Soldaki Harf Sesi Uzasın Mantığı
         function setupCarDrivingLogic() {
             const car = document.getElementById('carIcon');
             const road = document.getElementById('roadContainer');
@@ -606,7 +629,11 @@
             const onStart = (e) => {
                 e.preventDefault();
                 isDragging = true;
-                startMotorSound();
+                isDrivingSoundActive = true;
+                
+                // Soldaki harfin sesini uzatarak okumaya başla
+                const firstChar = activeCarSyllable[0];
+                speakContinuousChar(firstChar);
             };
 
             const onMove = (e) => {
@@ -616,25 +643,21 @@
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const roadRect = road.getBoundingClientRect();
 
-                // Soldan Sağa Hareket
                 let newX = clientX - roadRect.left - 25;
-
-                const minX = 75; // Sol Durak
-                const maxX = roadRect.width - 115; // Sağ Durak
+                const minX = 75;
+                const maxX = roadRect.width - 115;
 
                 if (newX < minX) newX = minX;
                 if (newX > maxX) newX = maxX;
 
                 car.style.left = `${newX}px`;
 
-                const progress = (newX - minX) / (maxX - minX);
-                updateMotorPitch(progress);
-
-                // Sağ Durağa Ulaşma Kontrolü
+                // Araba sağ harfe ulaştığında
                 if (newX >= maxX - 2) {
                     isDragging = false;
-                    stopMotorSound();
+                    isDrivingSoundActive = false;
                     triggerArrivalEffect();
+                    // Sağdaki harf eklenerek hecenin tamamı okunur
                     speakCurrentSyllable();
                     resetCarPosition();
                 }
@@ -643,7 +666,8 @@
             const onEnd = () => {
                 if (isDragging) {
                     isDragging = false;
-                    stopMotorSound();
+                    isDrivingSoundActive = false;
+                    window.speechSynthesis.cancel();
                     resetCarPosition();
                 }
             };
@@ -689,22 +713,20 @@
         function renderLetterGrid(containerId, slotNum) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
-
             const currentLetters = levelData[currentLevel].letters;
 
             currentLetters.forEach(char => {
                 const btn = document.createElement('button');
-                btn.className = 'btn-letter';
+                btn.className = slotNum === 1 ? 'btn-letter-first' : 'btn-letter-second';
                 btn.innerText = char;
-                // İsteğiniz üzerine harfe tıklandığında seslendirme tamamen KALDIRILDI.
                 btn.onclick = () => handleFreeLetterSelect(char, slotNum, btn, containerId);
                 container.appendChild(btn);
             });
         }
 
         function handleFreeLetterSelect(char, slotNum, buttonEl, containerId) {
-            const buttons = document.querySelectorAll(`#${containerId} .btn-letter`);
-            buttons.forEach(b => b.classList.remove('selected'));
+            const selector = slotNum === 1 ? '.btn-letter-first' : '.btn-letter-second';
+            document.querySelectorAll(selector).forEach(b => b.classList.remove('selected'));
             buttonEl.classList.add('selected');
 
             if (slotNum === 1) {
@@ -721,10 +743,7 @@
         function combineFreeLetters() {
             if (!selectedLetter1 || !selectedLetter2) return;
             const syl = selectedLetter1 + selectedLetter2;
-
             document.getElementById('freeResultDisplay').innerText = syl.toUpperCase();
-
-            // Yalnızca OKU butonuna tıklandığında hece seslendirilir
             speakText(syl);
         }
 
@@ -743,22 +762,39 @@
             document.getElementById('freeResultDisplay').innerText = '✨';
             document.getElementById('btnCombine').disabled = true;
 
-            document.querySelectorAll('.btn-letter').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.btn-letter-first, .btn-letter-second').forEach(b => b.classList.remove('selected'));
         }
 
-        // KESİN TÜRKÇE SESLENDİRME MOTORU
+        // UZATILMIŞ İLK HARF SESİ (Araba Sürerken)
+        function speakContinuousChar(char) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                // Harf sesini uzatmak için seslendirilecek metin tekrarlanır
+                const extendedText = char === 'e' ? 'eeee' : (char === 'a' ? 'aaaa' : char);
+                const utterance = new SpeechSynthesisUtterance(extendedText);
+                utterance.lang = 'tr-TR';
+                if (turkishVoice) utterance.voice = turkishVoice;
+                utterance.rate = 0.6; // Yavaş ve uzatmalı okuma
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // TÜRKÇE HECE KONTROLLÜ SESLENDİRME
         function speakText(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
 
-                const utterance = new SpeechSynthesisUtterance(text);
+                // Fonetik Türkçe karşılığı varsa onu kullan
+                const speakableText = trPhonetics[text.toLowerCase()] || text;
+
+                const utterance = new SpeechSynthesisUtterance(speakableText);
                 utterance.lang = 'tr-TR';
                 
                 if (turkishVoice) {
                     utterance.voice = turkishVoice;
                 }
 
-                utterance.rate = 0.75; // İlkokul seviyesine uygun net tempo
+                utterance.rate = 0.75; // Net Türkçe okuma temposu
                 utterance.pitch = 1.1;
 
                 window.speechSynthesis.speak(utterance);
